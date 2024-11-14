@@ -1,0 +1,10 @@
+numpy
+scipy
+pandas
+pyarrow
+embedding_reader
+faiss-cpu
+autofaiss
+hfutils
+hbutils
+tqdm
