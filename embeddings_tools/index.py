@@ -1,3 +1,4 @@
+import glob
 import os
 
 import click
@@ -20,6 +21,10 @@ def cli(input_dir: str):
 
     ids_dir = os.path.join(input_dir, 'ids')
     embs_dir = os.path.join(input_dir, 'embs')
+
+    ids_filenames = sorted([os.path.relpath(file, ids_dir) for file in glob.glob(os.path.join(ids_dir, '*.npy'))])
+    embs_filename = sorted([os.path.relpath(file, embs_dir) for file in glob.glob(os.path.join(embs_dir, '*.npy'))])
+    assert ids_filenames == embs_filename
 
     _, id_files = get_file_list(ids_dir, file_format='npy')
     ids = []
