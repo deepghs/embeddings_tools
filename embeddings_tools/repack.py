@@ -70,13 +70,13 @@ def localx(input_dir: str, output_dir: str, batch_size: int, prefix: Optional[st
                     file_fmt = f'{prefix}_{file_fmt}'
 
                 logging.info(f'Saving as part {current_ptr}, {plural_word(samples, "sample")} ...')
-                dst_id_file = os.path.join(output_dir, 'ids', file_fmt.format(value=value))
+                dst_id_file = os.path.join(output_dir, 'ids', file_fmt.format(value=current_ptr))
                 logging.info(f'Saving IDs to {dst_id_file!r} ...')
                 os.makedirs(os.path.dirname(dst_id_file), exist_ok=True)
                 np.save(dst_id_file, ids)
                 recorded_files.append(dst_id_file)
 
-                dst_embs_file = os.path.join(output_dir, 'embs', file_fmt.format(value=value))
+                dst_embs_file = os.path.join(output_dir, 'embs', file_fmt.format(value=current_ptr))
                 logging.info(f'Saving embeedings to {dst_embs_file!r} ...')
                 os.makedirs(os.path.dirname(dst_embs_file), exist_ok=True)
                 np.save(dst_embs_file, embs)
