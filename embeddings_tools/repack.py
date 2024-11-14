@@ -5,6 +5,7 @@ from tempfile import TemporaryDirectory
 from typing import Optional
 
 import click
+import faiss
 import numpy as np
 from ditk import logging
 from hbutils.string import plural_word
@@ -37,8 +38,10 @@ def cli():
               help='Repository to upload to.', show_default=True)
 @click.option('-d', '--dir_in_repo', 'dir_in_repo', type=str, default=None,
               help='Directory in repository.', show_default=True)
+@click.option('--raw', 'use_raw_embedding', is_flag=True, type=bool, default=False,
+              help='Use raw embeddings, dont normalize them.', show_default=True)
 def localx(input_dir: str, output_dir: str, batch_size: int, prefix: Optional[str] = None, level: int = 4,
-           repo_id: Optional[str] = None, dir_in_repo: Optional[str] = None):
+           repo_id: Optional[str] = None, dir_in_repo: Optional[str] = None, use_raw_embedding: bool = False):
     logging.try_init_root(logging.INFO)
     if not os.path.exists(input_dir):
         logging.error(f'Input directory {input_dir!r} not found, skipped.')
@@ -52,10 +55,13 @@ def localx(input_dir: str, output_dir: str, batch_size: int, prefix: Optional[st
         part_files = []
 
         def _save():
+
             nonlocal samples, ids, embs, current_ptr, width, sizes
             if samples:
                 ids = np.concatenate(ids)
                 embs = np.concatenate(embs)
+                if not use_raw_embedding:
+                    faiss.normalize_L2(embs)
                 assert len(ids.shape) == 1
                 assert len(embs.shape) == 2
                 width = embs.shape[1]
