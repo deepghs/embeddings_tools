@@ -9,7 +9,7 @@ import numpy as np
 from ditk import logging
 from embedding_reader.get_file_list import get_file_list
 from hbutils.system import TemporaryDirectory
-from hfutils.operate import upload_directory_as_directory
+from hfutils.operate import upload_directory_as_directory, get_hf_client
 from tqdm import tqdm
 
 from .utils import GLOBAL_CONTEXT_SETTINGS
@@ -29,6 +29,10 @@ def cli(input_dir: str, max_size: str, repo_id: str, index_name: Optional[str]):
     if not os.path.exists(input_dir):
         logging.error(f'Input directory {input_dir!r} not found, skipped.')
         return
+
+    hf_client = get_hf_client()
+    if not hf_client.repo_exists(repo_id=repo_id, repo_type='model'):
+        hf_client.create_repo(repo_id=repo_id, repo_type='model')
 
     ids_dir = os.path.join(input_dir, 'ids')
     embs_dir = os.path.join(input_dir, 'embs')
