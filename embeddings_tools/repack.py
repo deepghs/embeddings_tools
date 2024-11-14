@@ -137,3 +137,7 @@ def localx(input_dir: str, output_dir: str, batch_size: int, prefix: Optional[st
                 ],
                 commit_message=f'Upload {plural_word(total_samples, "embedding")} with ID(s)',
             )
+
+
+if __name__ == '__main__':
+    cli()
