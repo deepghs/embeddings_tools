@@ -36,7 +36,7 @@ def cli():
 @click.option('-r', '--repo_id', 'repo_id', type=str, default=None,
               help='Repository to upload to.', show_default=True)
 @click.option('-d', '--dir_in_repo', 'dir_in_repo', type=str, default=None,
-              help='Directory in repository.', show_defaul=True)
+              help='Directory in repository.', show_default=True)
 def localx(input_dir: str, output_dir: str, batch_size: int, prefix: Optional[str] = None, level: int = 4,
            repo_id: Optional[str] = None, dir_in_repo: Optional[str] = None):
     logging.try_init_root(logging.INFO)
