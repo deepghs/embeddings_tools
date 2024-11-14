@@ -51,7 +51,7 @@ def localx(input_dir: str, output_dir: str, batch_size: int, prefix: Optional[st
             [], [], [], [], 0, 0, 0, None, []
 
         def _save():
-            global samples, ids, embs, current_ptr, width, sizes
+            nonlocal samples, ids, embs, current_ptr, width, sizes
             if samples:
                 ids = np.concatenate(ids)
                 embs = np.concatenate(embs)
