@@ -49,6 +49,7 @@ def localx(input_dir: str, output_dir: str, batch_size: int, prefix: Optional[st
         recorded_files = []
         ids, embs, all_ids, all_embs, samples, total_samples, current_ptr, width, sizes = \
             [], [], [], [], 0, 0, 0, None, []
+        part_files = []
 
         def _save():
             nonlocal samples, ids, embs, current_ptr, width, sizes
@@ -81,6 +82,7 @@ def localx(input_dir: str, output_dir: str, batch_size: int, prefix: Optional[st
                 os.makedirs(os.path.dirname(dst_embs_file), exist_ok=True)
                 np.save(dst_embs_file, embs)
                 recorded_files.append(dst_embs_file)
+                part_files.append(file_fmt.format(value=current_ptr))
 
                 sizes.append(ids.shape[0])
                 current_ptr += 1
@@ -123,6 +125,7 @@ def localx(input_dir: str, output_dir: str, batch_size: int, prefix: Optional[st
                 'embedding_width': width,
                 'parts': current_ptr,
                 'part_sizes': sizes,
+                'part_files': part_files,
             }, f, indent=4, ensure_ascii=False, sort_keys=True)
         recorded_files.append(meta_file)
 
