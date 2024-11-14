@@ -8,3 +8,5 @@ autofaiss
 hfutils
 hbutils
 tqdm
+click>=8
+di-toolkit
