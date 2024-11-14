@@ -41,7 +41,7 @@ def localx(input_dir: str, output_dir: str, batch_size: int, prefix: Optional[st
            repo_id: Optional[str] = None, dir_in_repo: Optional[str] = None):
     logging.try_init_root(logging.INFO)
     if not os.path.exists(input_dir):
-        logging.info(f'Input directory {input_dir!r} not found, skipped.')
+        logging.error(f'Input directory {input_dir!r} not found, skipped.')
         return
 
     with TemporaryDirectory() as td:
@@ -109,7 +109,7 @@ def localx(input_dir: str, output_dir: str, batch_size: int, prefix: Optional[st
 
         _save()
         if not total_samples:
-            logging.info(f'Nothing found for {input_dir!r}, skipped.')
+            logging.error(f'Nothing found for {input_dir!r}, skipped.')
             return
 
         all_ids = np.concatenate(all_ids)
