@@ -1,5 +1,4 @@
 import glob
-import json
 import os
 from typing import Optional
 
@@ -8,6 +7,7 @@ import click
 import numpy as np
 from ditk import logging
 from embedding_reader.get_file_list import get_file_list
+from hbutils.string import plural_word
 from hbutils.system import TemporaryDirectory
 from hfutils.operate import upload_directory_as_directory, get_hf_client
 from tqdm import tqdm
@@ -49,7 +49,8 @@ def cli(input_dir: str, max_size: str, repo_id: str, index_name: Optional[str]):
         ids = np.concatenate(ids)
         logging.info(f'Shape of IDs data: {ids.shape!r}, dtype: {ids.dtype!r}')
         all_ids_file = os.path.join(td, 'ids.npy')
-        logging.info(f'Writing {all_ids_file!r} ...')
+        size = ids.shape[0]
+        logging.info(f'Writing {all_ids_file!r}, {plural_word(size, "sample")} in total ...')
         np.save(all_ids_file, ids)
 
         logging.info('Building index ...')
@@ -69,10 +70,7 @@ def cli(input_dir: str, max_size: str, repo_id: str, index_name: Optional[str]):
         )
         _ = metrics
 
-        with open(os.path.join(input_dir, 'meta.json'), 'r') as f:
-            meta_info = json.load(f)
-
-        index_name = index_name or f'{os.path.basename(input_dir)}_{meta_info["size"]}_{max_size}'
+        index_name = index_name or f'{os.path.basename(input_dir)}_{size}_{max_size}'
         upload_directory_as_directory(
             repo_id=repo_id,
             repo_type='model',
