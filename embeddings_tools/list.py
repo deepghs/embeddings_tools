@@ -50,23 +50,13 @@ def list_(repository: str, revision: str):
     for name in tqdm(names):
         item = {'Name': name}
         infos = json.loads(hf_fs.read_text(f'{repository}@{revision}/{name}/infos.json'))
-        for param_str in infos['index_param'].split(','):
-            param_name, param_value = param_str.split('=', maxsplit=1)
-            try:
-                param_value = int(param_value)
-            except:
-                try:
-                    param_value = float(param_value)
-                except:
-                    pass
-            item[f'{param_name} (Param)'] = param_value
 
         if hf_fs.exists(f'{repository}@{revision}/{name}/metrics.json'):
             metrics = json.loads(hf_fs.read_text(f'{repository}@{revision}/{name}/metrics.json'))
-            item["1-recall@20"] = f'{metrics["1-recall@20"] * 100:.1f}'
-            item["1-recall@40"] = f'{metrics["1-recall@40"] * 100:.1f}'
-            item["20-recall@20"] = f'{metrics["20-recall@20"] * 100:.1f}'
-            item["40-recall@40"] = f'{metrics["40-recall@40"] * 100:.1f}'
+            item["1-recall@20"] = f'{metrics["1-recall@20"] * 100:.1f}%'
+            item["1-recall@40"] = f'{metrics["1-recall@40"] * 100:.1f}%'
+            item["20-recall@20"] = f'{metrics["20-recall@20"] * 100:.1f}%'
+            item["40-recall@40"] = f'{metrics["40-recall@40"] * 100:.1f}%'
         else:
             item["1-recall@20"] = 'N/A'
             item["1-recall@40"] = 'N/A'
@@ -78,10 +68,21 @@ def list_(repository: str, revision: str):
         item['99% Speed (ms)'] = infos['99p_search_speed_ms']
         item['Reconstruction Error'] = f'{infos["reconstruction error %"]:.2f}%'
 
-        item['Index Key'] = infos['index_key']
         item['Total'] = infos['nb vectors']
         item['Width'] = infos['vectors dimension']
         item['Compression Ratio'] = f'{infos["compression ratio"]:.4g}'
+
+        item['Index Key'] = infos['index_key']
+        for param_str in infos['index_param'].split(','):
+            param_name, param_value = param_str.split('=', maxsplit=1)
+            try:
+                param_value = int(param_value)
+            except:
+                try:
+                    param_value = float(param_value)
+                except:
+                    pass
+            item[f'{param_name} (Param)'] = param_value
 
         repo_file: RepoFile = list(hf_client.get_paths_info(
             repo_id=repository,
