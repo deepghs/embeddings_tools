@@ -66,7 +66,7 @@ def hf(output_dir: str, repo_id: str, dir_in_repo: str):
                 embs.append(embedding)
             embs = np.stack(embs)
             assert len(embs.shape) == 2
-            ids = np.stack(ids)
+            ids = np.array(ids)
             assert len(ids.shape) == 1
             assert ids.shape[0] == embs.shape[0]
             np.save(dst_file, {
