@@ -60,11 +60,25 @@ def list_(repository: str, revision: str):
                 except:
                     pass
             item[f'{param_name} (Param)'] = param_value
-        item['Index Key'] = infos['index_key']
+
+        if hf_fs.exists(f'{repository}@{revision}/{name}/metrics.json'):
+            metrics = json.loads(hf_fs.read_text(f'{repository}@{revision}/{name}/metrics.json'))
+            item["1-recall@20"] = f'{metrics["1-recall@20"] * 100:.1f}'
+            item["1-recall@40"] = f'{metrics["1-recall@40"] * 100:.1f}'
+            item["20-recall@20"] = f'{metrics["20-recall@20"] * 100:.1f}'
+            item["40-recall@40"] = f'{metrics["40-recall@40"] * 100:.1f}'
+        else:
+            item["1-recall@20"] = 'N/A'
+            item["1-recall@40"] = 'N/A'
+            item["20-recall@20"] = 'N/A'
+            item["40-recall@40"] = 'N/A'
+
         item['Size'] = size_to_bytes_str(infos['size in bytes'], sigfigs=3)
         item['AVG Speed (ms)'] = infos['avg_search_speed_ms']
         item['99% Speed (ms)'] = infos['99p_search_speed_ms']
         item['Reconstruction Error'] = f'{infos["reconstruction error %"]:.2f}%'
+
+        item['Index Key'] = infos['index_key']
         item['Total'] = infos['nb vectors']
         item['Width'] = infos['vectors dimension']
         item['Compression Ratio'] = f'{infos["compression ratio"]:.4g}'
