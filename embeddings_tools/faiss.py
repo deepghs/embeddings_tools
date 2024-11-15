@@ -8,8 +8,6 @@ import click
 import numpy as np
 from ditk import logging
 from embedding_reader.get_file_list import get_file_list
-from embedding_reader import EmbeddingReader
-from hbutils.random import global_seed
 from hbutils.system import TemporaryDirectory
 from hfutils.operate import upload_directory_as_directory, get_hf_client
 from tqdm import tqdm
@@ -26,12 +24,7 @@ from .utils import GLOBAL_CONTEXT_SETTINGS
               help='Repository to upload to.', show_default=True)
 @click.option('-n', '--index_name', 'index_name', type=str, default=None,
               help='Index name in repository.', show_default=True)
-@click.option('-N', '--metrics_samples', 'metrics_samples', type=int, default=10000,
-              help='Samples of metrics.', show_default=True)
-@click.option('-s', '--seed', 'seed', type=int, default=0,
-              help='Seed of metrics', show_default=True)
-def cli(input_dir: str, max_size: str, repo_id: str, index_name: Optional[str],
-        metrics_samples: int, seed: int):
+def cli(input_dir: str, max_size: str, repo_id: str, index_name: Optional[str]):
     logging.try_init_root(level=logging.INFO)
     if not os.path.exists(input_dir):
         logging.error(f'Input directory {input_dir!r} not found, skipped.')
@@ -59,19 +52,7 @@ def cli(input_dir: str, max_size: str, repo_id: str, index_name: Optional[str],
         logging.info(f'Writing {all_ids_file!r} ...')
         np.save(all_ids_file, ids)
 
-        if seed is not None:
-            # native random, numpy, torch and faker's seeds are includes
-            # if you need to register more library for seeding, see:
-            # https://hansbug.github.io/hbutils/main/api_doc/random/state.html#register-random-source
-            logging.info(f'Globally set the random seed {seed!r}.')
-            global_seed(seed)
-
-        idx = np.arange(ids.shape[0])
-        np.random.shuffle(idx)
-        idx = idx[:metrics_samples]
-
-        logging.info('Picking samples from ')
-
+        logging.info('Building index ...')
         autofaiss.build_index(
             embeddings=embs_dir,
             index_path=os.path.join(td, 'knn.index'),
@@ -79,6 +60,15 @@ def cli(input_dir: str, max_size: str, repo_id: str, index_name: Optional[str],
             metric_type="ip",
             max_index_memory_usage=max_size,
         )
+
+        logging.info('Calculating metrics ...')
+        metrics = autofaiss.score_index(
+            index_path=os.path.join(td, 'knn.index'),
+            output_index_info_path=os.path.join(td, 'infos.json'),
+            embeddings=embs_dir,
+        )
+        with open(os.path.join(td, 'metrics.json'), 'w') as f:
+            json.dump(metrics, f, indent=4, sort_keys=True)
 
         with open(os.path.join(input_dir, 'meta.json'), 'r') as f:
             meta_info = json.load(f)
