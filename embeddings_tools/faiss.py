@@ -67,6 +67,7 @@ def cli(input_dir: str, max_size: str, repo_id: str, index_name: Optional[str]):
             output_index_info_path=os.path.join(td, 'metrics.json'),
             embeddings=embs_dir,
         )
+        _ = metrics
 
         with open(os.path.join(input_dir, 'meta.json'), 'r') as f:
             meta_info = json.load(f)

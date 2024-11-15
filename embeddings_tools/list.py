@@ -125,8 +125,8 @@ def list_(repository: str, revision: str):
                         else:
                             if tb_lines:
                                 df_c = markdown_to_df(os.linesep.join(tb_lines))
-                                if 'Name' in df_c.columns and 'FLOPS' in df_c.columns and \
-                                        'Params' in df_c.columns:
+                                if 'Name' in df_c.columns and 'Index Key' in df_c.columns and \
+                                        'Width' in df_c.columns:
                                     print(df.to_markdown(index=False, numalign="center", stralign="center"), file=f)
                                     table_printed = True
                                     tb_lines.clear()
