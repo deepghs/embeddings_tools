@@ -64,11 +64,9 @@ def cli(input_dir: str, max_size: str, repo_id: str, index_name: Optional[str]):
         logging.info('Calculating metrics ...')
         metrics = autofaiss.score_index(
             index_path=os.path.join(td, 'knn.index'),
-            output_index_info_path=os.path.join(td, 'infos.json'),
+            output_index_info_path=os.path.join(td, 'metrics.json'),
             embeddings=embs_dir,
         )
-        with open(os.path.join(td, 'metrics.json'), 'w') as f:
-            json.dump(metrics, f, indent=4, sort_keys=True)
 
         with open(os.path.join(input_dir, 'meta.json'), 'r') as f:
             meta_info = json.load(f)
