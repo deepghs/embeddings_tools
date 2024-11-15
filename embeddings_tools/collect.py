@@ -58,7 +58,7 @@ def hf(output_dir: str, repo_id: str, dir_in_repo: str):
 
             embs = []
             ids = []
-            for npy_file in glob.glob(os.path.join(td, '*.webp'), recursive=True):
+            for npy_file in glob.glob(os.path.join(td, '*.npy'), recursive=True):
                 id_ = int(os.path.splitext(os.path.basename(npy_file))[0])
                 embedding = np.load(npy_file)
                 assert len(embedding.shape) == 1
