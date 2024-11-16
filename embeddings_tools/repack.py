@@ -1,8 +1,9 @@
+import glob
 import json
 import os
 import random
 from tempfile import TemporaryDirectory
-from typing import Optional
+from typing import Optional, List
 
 import click
 import faiss
@@ -24,7 +25,7 @@ def cli():
 
 @cli.command('localx', context_settings={**GLOBAL_CONTEXT_SETTINGS},
              help='Repack embedding data from local npz directory, format: ids, embs, preds')
-@click.option('-i', '--input_dir', 'input_dir', type=str, required=True,
+@click.option('-i', '--input_dir', 'input_dirs', type=str, required=True, multiple=True,
               help='Input directory.', show_default=True)
 @click.option('-o', '--output_dir', 'output_dir', type=str, default=None,
               help='Output directory, use a temp directory when not assigned.', show_default=True)
@@ -40,12 +41,9 @@ def cli():
               help='Directory in repository.', show_default=True)
 @click.option('--raw', 'use_raw_embedding', is_flag=True, type=bool, default=False,
               help='Use raw embeddings, dont normalize them.', show_default=True)
-def localx(input_dir: str, output_dir: str, batch_size: int, prefix: Optional[str] = None, level: int = 4,
+def localx(input_dirs: List[str], output_dir: str, batch_size: int, prefix: Optional[str] = None, level: int = 4,
            repo_id: Optional[str] = None, dir_in_repo: Optional[str] = None, use_raw_embedding: bool = False):
     logging.try_init_root(logging.INFO)
-    if not os.path.exists(input_dir):
-        logging.error(f'Input directory {input_dir!r} not found, skipped.')
-        return
 
     with TemporaryDirectory() as td:
         output_dir = output_dir or td
@@ -96,14 +94,25 @@ def localx(input_dir: str, output_dir: str, batch_size: int, prefix: Optional[st
                 embs = []
                 samples = 0
 
-        logging.info(f'Scanning for {input_dir!r} ...')
-        tar_files = os.listdir(input_dir)
+        tar_files = []
+        for input_dir in input_dirs:
+            segs = input_dir.split('.', maxsplit=1)
+            if len(segs) == 1:
+                input_dir_prefix, input_dir = prefix, segs[0]
+            else:
+                input_dir_prefix, input_dir = segs
+
+            logging.info(f'Scanning for {input_dir!r} ...')
+            input_dir_tar_files = glob.glob(os.path.join(input_dir, '**', '*.npz'), recursive=True)
+            for file in input_dir_tar_files:
+                tar_files.append((input_dir_prefix, file))
         random.shuffle(tar_files)
-        for file in tqdm(tar_files):
-            data = np.load(os.path.join(input_dir, file))
+
+        for file_prefix, file in tqdm(tar_files):
+            data = np.load(file)
             ii, e = data['ids'], data['embs']
-            if prefix is not None:
-                ii = np.array([f'{prefix}_{x}' for x in ii])
+            if file_prefix:
+                ii = np.array([f'{file_prefix}_{x}' for x in ii])
             ids.append(ii)
             embs.append(e)
             all_ids.append(ii)
