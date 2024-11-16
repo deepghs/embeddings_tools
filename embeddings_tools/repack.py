@@ -128,10 +128,8 @@ def localx(input_dirs: List[str], output_dir: str, batch_size: int, prefix: Opti
             return
 
         all_ids = np.concatenate(all_ids)
-        all_embs = np.concatenate(all_embs)
         assert len(all_ids.shape) == 1
-        assert len(all_embs.shape) == 2
-        assert all_ids.shape[0] == all_embs.shape[0] == total_samples
+        assert all_ids.shape[0] == total_samples
 
         meta_file = os.path.join(output_dir, 'meta.json')
         with open(meta_file, 'w') as f:
