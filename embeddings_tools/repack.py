@@ -96,7 +96,7 @@ def localx(input_dirs: List[str], output_dir: str, batch_size: int, prefix: Opti
 
         tar_files = []
         for input_dir in input_dirs:
-            segs = input_dir.split('.', maxsplit=1)
+            segs = input_dir.split(':', maxsplit=1)
             if len(segs) == 1:
                 input_dir_prefix, input_dir = prefix, segs[0]
             else:
