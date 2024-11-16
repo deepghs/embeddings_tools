@@ -102,7 +102,7 @@ def localx(input_dirs: List[str], output_dir: str, batch_size: int, prefix: Opti
             else:
                 input_dir_prefix, input_dir = segs
 
-            logging.info(f'Scanning for {input_dir!r} ...')
+            logging.info(f'Scanning for {input_dir!r}, prefix: {input_dir_prefix!r} ...')
             input_dir_tar_files = glob.glob(os.path.join(input_dir, '**', '*.npz'), recursive=True)
             for file in input_dir_tar_files:
                 tar_files.append((input_dir_prefix, file))
