@@ -75,13 +75,6 @@ def list_(repository: str, revision: str):
         item['Index Key'] = infos['index_key']
         for param_str in infos['index_param'].split(','):
             param_name, param_value = param_str.split('=', maxsplit=1)
-            try:
-                param_value = int(param_value)
-            except:
-                try:
-                    param_value = float(param_value)
-                except:
-                    pass
             item[f'{param_name} (Param)'] = param_value
 
         repo_file: RepoFile = list(hf_client.get_paths_info(
