@@ -11,3 +11,4 @@ tqdm
 click>=8
 di-toolkit
 tabulate
+psutil
