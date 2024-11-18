@@ -5,6 +5,8 @@ Framework for processing embeddings and training indices with that.
 ## Installation
 
 ```shell
+git clone https://github.com/deepghs/embeddings_tools.git
+cd embeddings_tools
 pip install -r requirements.txt
 ```
 
