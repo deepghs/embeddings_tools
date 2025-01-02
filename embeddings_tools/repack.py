@@ -48,12 +48,11 @@ def localx(input_dirs: List[str], output_dir: str, batch_size: int, prefix: Opti
     with TemporaryDirectory() as td:
         output_dir = output_dir or td
         recorded_files = []
-        ids, embs, all_ids, all_embs, samples, total_samples, current_ptr, width, sizes = \
-            [], [], [], [], 0, 0, 0, None, []
+        ids, embs, samples, total_samples, current_ptr, width, sizes = \
+            [], [], 0, 0, 0, None, []
         part_files = []
 
         def _save():
-
             nonlocal samples, ids, embs, current_ptr, width, sizes
             if samples:
                 ids = np.concatenate(ids)
@@ -115,8 +114,6 @@ def localx(input_dirs: List[str], output_dir: str, batch_size: int, prefix: Opti
                 ii = np.array([f'{file_prefix}_{x}' for x in ii])
             ids.append(ii)
             embs.append(e)
-            all_ids.append(ii)
-            all_embs.append(e)
             samples += e.shape[0]
             total_samples += e.shape[0]
             if samples >= batch_size:
@@ -126,10 +123,6 @@ def localx(input_dirs: List[str], output_dir: str, batch_size: int, prefix: Opti
         if not total_samples:
             logging.error(f'Nothing found for {input_dir!r}, skipped.')
             return
-
-        all_ids = np.concatenate(all_ids)
-        assert len(all_ids.shape) == 1
-        assert all_ids.shape[0] == total_samples
 
         meta_file = os.path.join(output_dir, 'meta.json')
         with open(meta_file, 'w') as f:
